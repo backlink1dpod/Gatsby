@@ -9,16 +9,15 @@
  */
 module.exports = {
   siteMetadata: {
-    title: `Gatsby Starter Blog`,
+    title: `Backlink 1d Blog`,
     author: {
-      name: `Kyle Mathews`,
-      summary: `who lives and works in San Francisco building useful things.`,
+      name: `Backlink 1d`,
+      summary: `Dịch vụ backlink giá rẻ`,
     },
     description: `A starter blog demonstrating what Gatsby can do.`,
-    siteUrl: `https://gatsbystarterblogsource.gatsbyjs.io/`,
+    siteUrl: `https://backlink1d.web.app/`,
     social: {
-      twitter: `kylemathews`,
-    },
+    }, 
   },
   plugins: [
     `gatsby-plugin-image`,
@@ -121,5 +120,6 @@ module.exports = {
         icon: `src/images/gatsby-icon.png`, // This path is relative to the root of the site.
       },
     },
+    `gatsby-plugin-sitemap`,
   ],
 }
