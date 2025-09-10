@@ -1,4 +1,4 @@
-name: Deploy to Bunny.net
+name: Deploy Gatsby repo to Bunny.net
 
 on:
   push:
@@ -13,7 +13,7 @@ jobs:
       - name: Checkout source
         uses: actions/checkout@v3
 
-      - name: Deploy to Bunny Storage (incremental sync)
+      - name: Upload all files to Bunny Storage
         uses: SamKirkland/FTP-Deploy-Action@v4.3.4
         with:
           server: sg.storage.bunnycdn.com
@@ -21,7 +21,7 @@ jobs:
           password: ${{ secrets.BUNNY_PASSWORD }}
           protocol: ftp
           port: 21
-          local-dir: ./public/
+          local-dir: ./
           server-dir: /bl1d/
           log-level: minimal
           state-name: .ftp-deploy-sync-state.json
