@@ -1,4 +1,4 @@
-name: Deploy Gatsby repo to Bunny.net
+name: Deploy Gatsby site to Bunny.net
 
 on:
   push:
@@ -10,10 +10,12 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      # Lấy source từ GitHub
       - name: Checkout source
         uses: actions/checkout@v3
 
-      - name: Upload repo to Bunny Storage (exclude cache & workflows)
+      # Upload chỉ thư mục public (site đã build sẵn)
+      - name: Deploy public/ to Bunny Storage
         uses: SamKirkland/FTP-Deploy-Action@v4.3.4
         with:
           server: sg.storage.bunnycdn.com
@@ -21,12 +23,7 @@ jobs:
           password: ${{ secrets.BUNNY_PASSWORD }}
           protocol: ftp
           port: 21
-          local-dir: ./
+          local-dir: ./public/
           server-dir: /bl1d/
           log-level: minimal
           state-name: .ftp-deploy-sync-state.json
-          exclude: |
-            **/.git*
-            **/.cache/**
-            **/.github/workflows/**
-            **/node_modules/**
