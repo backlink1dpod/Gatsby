@@ -13,7 +13,7 @@ jobs:
       - name: Checkout source
         uses: actions/checkout@v3
 
-      - name: Upload all files to Bunny Storage
+      - name: Upload repo to Bunny Storage (exclude cache & workflows)
         uses: SamKirkland/FTP-Deploy-Action@v4.3.4
         with:
           server: sg.storage.bunnycdn.com
@@ -25,3 +25,8 @@ jobs:
           server-dir: /bl1d/
           log-level: minimal
           state-name: .ftp-deploy-sync-state.json
+          exclude: |
+            **/.git*
+            **/.cache/**
+            **/.github/workflows/**
+            **/node_modules/**
