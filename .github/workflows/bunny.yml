@@ -10,11 +10,23 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # Lấy source từ GitHub
+      # 1. Lấy source từ GitHub (Không đổi)
       - name: Checkout source
         uses: actions/checkout@v3
 
-      # Upload chỉ thư mục public (site đã build sẵn)
+      # 2. (THÊM MỚI) Khôi phục file trạng thái sync từ cache
+      # Bước này sẽ tìm và tải về file .ftp-deploy-sync-state.json từ lần chạy thành công trước đó.
+      # Nếu không tìm thấy (lần chạy đầu tiên), nó sẽ bỏ qua một cách an toàn.
+      - name: Restore FTP sync state
+        uses: actions/cache@v3
+        with:
+          path: ./.ftp-deploy-sync-state.json # Đường dẫn tới file cần cache
+          key: ftp-sync-state-${{ github.ref }} # Khóa cache, duy nhất cho mỗi branch
+
+      # 3. Upload chỉ thư mục public (Gần như không đổi)
+      # Action này sẽ đọc file .ftp-deploy-sync-state.json (nếu có)
+      # để so sánh và chỉ upload những file mới hoặc đã thay đổi.
+      # Sau đó nó sẽ cập nhật lại file này với trạng thái mới.
       - name: Deploy public/ to Bunny Storage
         uses: SamKirkland/FTP-Deploy-Action@v4.3.4
         with:
@@ -26,4 +38,7 @@ jobs:
           local-dir: ./public/
           server-dir: /bl1d/
           log-level: minimal
-          state-name: .ftp-deploy-sync-state.json
+          state-name: .ftp-deploy-sync-state.json # Tên file trạng thái này phải khớp với 'path' ở bước cache
+
+      # Bước lưu cache sẽ được actions/cache@v3 tự động thực hiện vào cuối job
+      # nếu file .ftp-deploy-sync-state.json được tạo ra hoặc thay đổi.
