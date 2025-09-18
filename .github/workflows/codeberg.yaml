@@ -1,0 +1,59 @@
+name: Deploy Gatsby to Codeberg Pages
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      # 1. Checkout source
+      - name: Checkout source
+        uses: actions/checkout@v3
+
+      # 2. Setup Node.js
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 20
+
+      # 3. Cache node_modules để tăng tốc độ build
+      - name: Cache node_modules
+        uses: actions/cache@v3
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+
+      # 4. Install dependencies
+      - name: Install dependencies
+        run: npm ci
+
+      # 5. Build Gatsby
+      - name: Build Gatsby site
+        run: npm run build
+        # Gatsby sẽ xuất ra ./public/
+
+      # 6. Setup SSH để push sang Codeberg
+      - name: Setup SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.CODEBERG_DEPLOY_KEY }}" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+          ssh-keyscan codeberg.org >> ~/.ssh/known_hosts
+
+      # 7. Deploy public/ sang Codeberg Pages repo
+      - name: Deploy to Codeberg
+        run: |
+          cd public
+          git init
+          git config user.name "github-actions"
+          git config user.email "actions@github.com"
+          git add .
+          git commit -m "Deploy from GitHub Actions"
+          git branch -M main
+          git remote add origin git@codeberg.org:bl1d/pages.git
+          git push --force origin main
